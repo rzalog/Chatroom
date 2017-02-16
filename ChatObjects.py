@@ -12,15 +12,17 @@ USER_SERVER = "SERVER"
 MAX_MSG_LEN = 1024
 
 class Message:
-	def __init__(this, username, function, body=""):
-		this.user = username
-		this.func = function
-		this.body = body
-	def __str__(this):
-		return string_from_message(this)
+	def __init__(self, username, function, body=""):
+		self.user = username
+		self.func = function
+		self.body = body
+	def __str__(self):
+		return string_from_message(self)
 
 def message_from_string(message):
 	lines = message.splitlines()
+	if len(lines) == 0:
+		return 0
 	user = lines[0].split(' ')[1]
 	func = lines[1].split(' ')[1]
 	body = '\n'.join(lines[3:])
