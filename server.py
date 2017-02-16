@@ -1,11 +1,23 @@
 #!/usr/local/Cellar/python3/3.5.2_1/bin/python3.5
 
 import sys
+import threading
+import select
 from socket import *
 from ChatObjects import *
 
+client_socks = []
 active_client_socks = dict()
 active_users = set()
+
+class AcceptNewClientsThread(threading.Thread):
+	def __init__(self, client_socks):
+		self.client_socks = client_socks
+		threading.Thread.__init__(self)
+	def run(self):
+		while True:
+			client_sock, client_addr = serv_sock.accept()
+			client_socks.append(client_sock)
 
 def handle_message(message, client_sock):
 	if message == 0:
@@ -32,7 +44,7 @@ def create_user(message, client_sock):
 		send_message(client_sock, response)
 
 def recv_sent_message(message):
-	for client_sock in active_client_socks:
+	for client_sock in client_socks:
 		print('Sent message to {}'.format(active_client_socks[client_sock]))
 		send_message(client_sock, message)
 
@@ -50,16 +62,19 @@ portno = int(sys.argv[1])
 serv_sock = socket(AF_INET, SOCK_STREAM)
 
 serv_sock.bind ( ('', portno) )
-serv_sock.listen(1)
+serv_sock.listen(10)
 
 print('Server is listening.')
+accept_new_clients_thread = AcceptNewClientsThread(client_socks)
+accept_new_clients_thread.start()
 
 active_users.add('rzalog')
 
-client_sock, client_addr = serv_sock.accept()
-
 while True:
-	client_msg = recv_message(client_sock)
-	handle_message(client_msg, client_sock)
+	read_socks, write_socks, error_socks = select.select(client_socks,
+		client_socks, client_socks, 0)
+	for sock in read_socks:
+		message = recv_message(sock)
+		handle_message(message, sock)
 
 client_sock.close()
