@@ -1,4 +1,4 @@
-#!/usr/local/Cellar/python3/3.5.2_1/bin/python3.5
+#!/usr/local/bin/python3
 
 import sys
 import threading
@@ -67,8 +67,6 @@ serv_sock.listen(10)
 print('Server is listening.')
 accept_new_clients_thread = AcceptNewClientsThread(client_socks)
 accept_new_clients_thread.start()
-
-active_users.add('rzalog')
 
 while True:
 	read_socks, write_socks, error_socks = select.select(client_socks,

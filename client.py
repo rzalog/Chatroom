@@ -1,4 +1,4 @@
-#!/usr/local/Cellar/python3/3.5.2_1/bin/python3.5
+#!/usr/local/bin/python3
 
 import sys
 import threading
